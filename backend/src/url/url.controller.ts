@@ -1,7 +1,23 @@
-import { Controller, Post, Get, Body, Param, Req, Res } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Body,
+  Param,
+  Req,
+  Res,
+  HttpCode,
+  HttpStatus,
+  Delete,
+} from '@nestjs/common';
 import { Request, Response } from 'express';
 import { UrlService } from './url.service';
-import { CreateUrlDto, UrlResponseDto } from './url.dto';
+import {
+  CreateUrlDto,
+  UrlAnalyticsDto,
+  UrlInfoDto,
+  UrlResponseDto,
+} from './url.dto';
 import {
   ApiTags,
   ApiOperation,
@@ -53,16 +69,82 @@ export class UrlController {
     @Req() req: Request,
     @Res() res: Response,
   ): Promise<void> {
+    const ip = req.ip || 'unknown';
     const originalUrl = await this.urlService.getOriginalUrl(shortCode);
 
-    // тут регистрируем клик
+    this.urlService.recordClick(shortCode, ip).catch(console.error);
 
     res.redirect(originalUrl);
   }
+
+  @Get('info/:shortCode')
+  @ApiOperation({
+    summary: 'Get URL info',
+    description: 'Returns information about the short URL',
+  })
+  @ApiParam({
+    name: 'shortCode',
+    description: 'Short code or alias of the URL',
+    example: 'abc123',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Information about the URL',
+    type: UrlInfoDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Short URL not found',
+  })
+  async getUrlInfo(@Param('shortCode') shortCode: string): Promise<UrlInfoDto> {
+    return this.urlService.getUrlInfo(shortCode);
+  }
+
+  @Delete('delete/:shortCode')
+  @ApiOperation({
+    summary: 'Delete short URL',
+    description: 'Deletes the short URL and all associated statistics',
+  })
+  @ApiParam({
+    name: 'shortCode',
+    description: 'Short code or alias of the URL',
+    example: 'abc123',
+  })
+  @ApiResponse({
+    status: 204,
+    description: 'URL successfully deleted',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Short URL not found',
+  })
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteUrl(@Param('shortCode') shortCode: string): Promise<void> {
+    return this.urlService.deleteUrl(shortCode);
+  }
+
+  @Get('analytics/:shortCode')
+  @ApiOperation({
+    summary: 'Get URL analytics',
+    description: 'Returns statistics for the short URL',
+  })
+  @ApiParam({
+    name: 'shortCode',
+    description: 'Short code or alias of the URL',
+    example: 'abc123',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Analytics for the short URL',
+    type: UrlAnalyticsDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Short URL not found',
+  })
+  async getAnalytics(
+    @Param('shortCode') shortCode: string,
+  ): Promise<UrlAnalyticsDto> {
+    return this.urlService.getAnalytics(shortCode);
+  }
 }
-
-// @Get('info/:shortCode')
-
-// @Delete('delete/:shortCode')
-
-// @Get('analytics/:shortCode')

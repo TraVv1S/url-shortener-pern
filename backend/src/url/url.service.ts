@@ -4,7 +4,12 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateUrlDto, UrlResponseDto } from './url.dto';
+import {
+  CreateUrlDto,
+  UrlAnalyticsDto,
+  UrlInfoDto,
+  UrlResponseDto,
+} from './url.dto';
 import { Url } from '../../generated/prisma';
 
 @Injectable()
@@ -77,5 +82,84 @@ export class UrlService {
     }
 
     return url.original;
+  }
+
+  async recordClick(shortCode: string, ip: string): Promise<void> {
+    const url = await this.prisma.url.findUnique({
+      where: { alias: shortCode },
+    });
+
+    if (!url) {
+      throw new NotFoundException('Short URL not found');
+    }
+
+    await this.prisma.$transaction([
+      this.prisma.url.update({
+        where: { alias: shortCode },
+        data: { clickCount: { increment: 1 } },
+      }),
+      this.prisma.click.create({
+        data: {
+          urlId: url.id,
+          ip,
+        },
+      }),
+    ]);
+  }
+
+  async getUrlInfo(shortCode: string): Promise<UrlInfoDto> {
+    const url = await this.prisma.url.findUnique({
+      where: { alias: shortCode },
+    });
+
+    if (!url) {
+      throw new NotFoundException('Short URL not found');
+    }
+
+    return {
+      originalUrl: url.original,
+      createdAt: url.createdAt,
+      clickCount: url.clickCount,
+    };
+  }
+
+  async deleteUrl(shortCode: string): Promise<void> {
+    const url = await this.prisma.url.findUnique({
+      where: { alias: shortCode },
+    });
+
+    if (!url) {
+      throw new NotFoundException('Short URL not found');
+    }
+
+    await this.prisma.$transaction([
+      this.prisma.click.deleteMany({
+        where: { urlId: url.id },
+      }),
+      this.prisma.url.delete({
+        where: { alias: shortCode },
+      }),
+    ]);
+  }
+
+  async getAnalytics(shortCode: string): Promise<UrlAnalyticsDto> {
+    const url = await this.prisma.url.findUnique({
+      where: { alias: shortCode },
+      include: {
+        clicks: {
+          orderBy: { date: 'desc' },
+          take: 5,
+        },
+      },
+    });
+
+    if (!url) {
+      throw new NotFoundException('Short URL not found');
+    }
+
+    return {
+      clickCount: url.clickCount,
+      recentIps: url.clicks.map((click) => click.ip),
+    };
   }
 }

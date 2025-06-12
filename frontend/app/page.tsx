@@ -1,4 +1,5 @@
 import { UrlForm } from "@/components/UrlForm";
+import { UrlManager } from "@/components/UrlManager";
 
 export default function Home() {
   return (
@@ -10,6 +11,7 @@ export default function Home() {
 
         <main className="flex flex-col gap-8">
           <UrlForm />
+          <UrlManager />
         </main>
 
         <footer className="text-center text-gray-500 text-sm">

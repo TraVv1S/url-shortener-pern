@@ -59,3 +59,26 @@ export class UrlResponseDto {
   @ApiProperty({ description: 'Number of clicks on the link' })
   clickCount: number;
 }
+
+export class UrlInfoDto {
+  @ApiProperty({ description: 'Оригинальная ссылка' })
+  originalUrl: string;
+
+  @ApiProperty({ description: 'Дата создания ссылки' })
+  createdAt: Date;
+
+  @ApiProperty({ description: 'Количество переходов по ссылке' })
+  clickCount: number;
+}
+
+export class UrlAnalyticsDto {
+  @ApiProperty({ description: 'Общее количество переходов' })
+  clickCount: number;
+
+  @ApiProperty({
+    description: 'Последние 5 IP-адресов посетителей',
+    type: [String],
+    example: ['192.168.1.1', '192.168.1.2'],
+  })
+  recentIps: string[];
+}

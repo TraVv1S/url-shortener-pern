@@ -86,6 +86,17 @@ export const UrlForm = () => {
           />
         </div>
 
+        <div className="w-full flex flex-col gap-2">
+          <label htmlFor="expiresAt">Дата истечения (опционально)</label>
+          <input
+            type="datetime-local"
+            id="expiresAt"
+            value={expiresAt}
+            onChange={(e) => setExpiresAt(e.target.value)}
+            className="w-full border rounded-md p-2 bg-foreground text-lg text-background"
+          />
+        </div>
+
         {error && (
           <div className="p-3 bg-red-100 border border-red-400 text-red-700 rounded">
             {error}
