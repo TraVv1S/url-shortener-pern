@@ -15,8 +15,8 @@ describe('AppController', () => {
   });
 
   describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!');
+    it('should return "Sokrat.im url shortener API"', () => {
+      expect(appController.getHello()).toBe('Sokrat.im url shortener API');
     });
   });
 });
