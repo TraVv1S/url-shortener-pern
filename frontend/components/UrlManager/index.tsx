@@ -12,6 +12,12 @@ export const UrlManager = () => {
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"info" | "analytics">("info");
 
+  const formatIp = (ip: string) => {
+    if (ip.startsWith("::ffff:")) return ip.replace("::ffff:", "");
+    if (ip === "::1") return "127.0.0.1";
+    return ip;
+  };
+
   const handleGetInfo = async () => {
     if (!shortCode) return;
 
@@ -72,7 +78,7 @@ export const UrlManager = () => {
   return (
     <div className="w-full p-4 bg-gray-50 rounded-lg">
       <details>
-        <summary className="text-xl font-semibold text-gray-800">
+        <summary className="text-xl font-semibold text-gray-800 cursor-pointer">
           Управление ссылками
         </summary>
         <div className="w-full flex flex-col gap-4 p-4">
@@ -188,7 +194,7 @@ export const UrlManager = () => {
                     {analytics.recentIps.length > 0 ? (
                       <ul className="list-disc list-inside text-gray-600">
                         {analytics.recentIps.map((ip, index) => (
-                          <li key={index}>{ip}</li>
+                          <li key={index}>{formatIp(ip)}</li>
                         ))}
                       </ul>
                     ) : (
