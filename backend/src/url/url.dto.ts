@@ -35,27 +35,27 @@ export class CreateUrlDto {
 }
 
 export class UrlResponseDto {
-  @ApiProperty({ description: 'Уникальный идентификатор ссылки' })
+  @ApiProperty({ description: 'Url ID' })
   id: string;
 
-  @ApiProperty({ description: 'Алиас короткой ссылки', nullable: true })
+  @ApiProperty({ description: 'Short URL alias', nullable: true })
   alias: string | null;
 
   @ApiProperty({
-    description: 'Полная короткая ссылка',
+    description: 'Full short URL',
     example: 'http://localhost:4000/abc123',
   })
   shortUrl: string;
 
-  @ApiProperty({ description: 'Оригинальная ссылка' })
+  @ApiProperty({ description: 'Original URL' })
   originalUrl: string;
 
-  @ApiProperty({ description: 'Дата создания ссылки' })
+  @ApiProperty({ description: 'Date of link creation' })
   createdAt: Date;
 
-  @ApiProperty({ description: 'Дата истечения ссылки', nullable: true })
+  @ApiProperty({ description: 'Link expiration date', nullable: true })
   expiresAt: Date | null;
 
-  @ApiProperty({ description: 'Количество переходов по ссылке' })
+  @ApiProperty({ description: 'Number of clicks on the link' })
   clickCount: number;
 }
